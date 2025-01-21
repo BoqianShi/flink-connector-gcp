@@ -1,15 +1,15 @@
 package com.google.flink.connector.gcp.bigquery;
 
-import com.google.api.services.bigquery.model.TableFieldSchema;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.types.DataType;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
-import java.util.Arrays;
-
+import com.google.api.services.bigquery.model.TableFieldSchema;
 import static com.google.common.truth.Truth.assertThat;
 
 /** Tests for {@link BigQueryTypeUtils}. */
