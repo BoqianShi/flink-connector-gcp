@@ -115,8 +115,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     public List<String> listDatabases() throws CatalogException {
         List<String> targetReturnList = new ArrayList<>();
         try {
-            Datasets.List listDatasets = this.client.datasets().list(this.projectId);
-            DatasetList datasets = listDatasets.execute();
+            DatasetList datasets = this.client.datasets().list(this.projectId).execute();
 
             if (datasets == null || datasets.getDatasets() == null) {
                 LOG.debug("Project does not contain any datasets.");
@@ -134,8 +133,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     @Override
     public CatalogDatabase getDatabase(String databaseName) throws DatabaseNotExistException, CatalogException {
         try {
-            Datasets.Get getDataset = this.client.datasets().get(this.projectId, databaseName);
-            Dataset dataset = getDataset.execute();
+            Dataset dataset = this.client.datasets().get(this.projectId, databaseName).execute();
             if (dataset == null) {
                 throw new DatabaseNotExistException(getName(), databaseName);
             }
@@ -149,8 +147,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
         try {
-            Datasets.Get getDataset = this.client.datasets().get(this.projectId, databaseName);
-            Dataset dataset = getDataset.execute();
+            Dataset dataset = this.client.datasets().get(this.projectId, databaseName).execute();
             return dataset != null;
         } catch (IOException e) {
             throw new CatalogException("Failed to check if database exists: " + databaseName + e);
@@ -179,8 +176,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     public List<String> listTables(String databaseName) throws DatabaseNotExistException, CatalogException {
         List<String> targetReturnList = new ArrayList<>();
         try {
-            Tables.List listTables = this.client.tables().list(this.projectId, databaseName);
-            TableList tables = listTables.execute();
+            TableList tables = this.client.tables().list(this.projectId, databaseName).execute();
             if (tables != null && tables.getTables() != null) {
                 tables.getTables().forEach(table -> {
                     if (table.getType().equals("TABLE")) {
@@ -199,8 +195,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     public List<String> listViews(String databaseName) throws DatabaseNotExistException, CatalogException {
         List<String> targetReturnList = new ArrayList<>();
         try {
-            Tables.List listTables = this.client.tables().list(this.projectId, databaseName);
-            TableList tables = listTables.execute();
+            TableList tables = this.client.tables().list(this.projectId, databaseName).execute();
 
             if (tables != null && tables.getTables() != null) {
                 tables.getTables().forEach(table -> {
@@ -255,8 +250,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
         try {
-            Tables.Get getTable = this.client.tables().get(this.projectId, tablePath.getDatabaseName(), tablePath.getObjectName());
-            Table table = getTable.execute();
+            Table table = this.client.tables().get(this.projectId, tablePath.getDatabaseName(), tablePath.getObjectName()).execute();
             return table != null;
         } catch (IOException e) {
             throw new CatalogException("Failed to check if table exists: " + tablePath, e);
@@ -364,8 +358,7 @@ public class BigQueryCatalog extends AbstractCatalog {
     @Override
     public CatalogTableStatistics getTableStatistics(ObjectPath tablePath) throws TableNotExistException, CatalogException {
         try {
-            Tables.Get getTable = this.client.tables().get(this.projectId, tablePath.getDatabaseName(), tablePath.getObjectName());
-            Table table = getTable.execute();
+            Table table = this.client.tables().get(this.projectId, tablePath.getDatabaseName(), tablePath.getObjectName()).execute();
 
             if (table != null) {
                 BigInteger numRows = table.getNumRows();
