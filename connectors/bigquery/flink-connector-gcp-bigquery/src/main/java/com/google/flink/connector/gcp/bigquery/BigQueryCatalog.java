@@ -85,7 +85,8 @@ public class BigQueryCatalog extends AbstractCatalog {
                     GsonFactory.getDefaultInstance(),
                     httpRequest -> {
                         httpCredentialsAdapter.initialize(httpRequest);
-                        httpRequest.setThrowExceptionOnExecuteError(false);})
+                        httpRequest.setThrowExceptionOnExecuteError(false);
+                    })
                     .setApplicationName("BigQuery Flink Catalog Plugin")
                     .build();
         } catch (GeneralSecurityException | IOException e) {
@@ -104,11 +105,8 @@ public class BigQueryCatalog extends AbstractCatalog {
             } finally {
                 client = null;
             }
-        } else if (client != null) {
-            client = null;
-            LOG.info("BigQuery client was open, but using a transport without explicit shutdown. Nullifying client.");
         } else {
-            LOG.info("BigQuery client was not open, nothing to close.");
+            client = null;
         }
     }
 
@@ -154,15 +152,14 @@ public class BigQueryCatalog extends AbstractCatalog {
             Datasets.Get getDataset = this.client.datasets().get(this.projectId, databaseName);
             Dataset dataset = getDataset.execute();
             return dataset != null;
-        } catch (GoogleJsonResponseException e) {
-            throw new CatalogException("Failed to check if database exists: " + databaseName, e);
         } catch (IOException e) {
-            throw new CatalogException("Failed to check if database exists: " + databaseName, e);
+            throw new CatalogException("Failed to check if database exists: " + databaseName + e);
         }
     }
 
     @Override
-    public void createDatabase(String databaseName, CatalogDatabase database, boolean ignoreIfExists) throws DatabaseAlreadyExistException, CatalogException {
+    public void createDatabase(String databaseName, CatalogDatabase database,
+            boolean ignoreIfExists) throws DatabaseAlreadyExistException, CatalogException {
         throw new UnsupportedOperationException("Function createDatabase not supported yet.");
     }
 
@@ -172,7 +169,8 @@ public class BigQueryCatalog extends AbstractCatalog {
     }
 
     @Override
-    public void alterDatabase(String name, CatalogDatabase newDatabase, boolean ignoreIfNotExists) throws DatabaseNotExistException, CatalogException {
+    public void alterDatabase(String name, CatalogDatabase newDatabase,
+            boolean ignoreIfNotExists) throws DatabaseNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterDatabase not supported yet.");
     }
 
@@ -260,8 +258,6 @@ public class BigQueryCatalog extends AbstractCatalog {
             Tables.Get getTable = this.client.tables().get(this.projectId, tablePath.getDatabaseName(), tablePath.getObjectName());
             Table table = getTable.execute();
             return table != null;
-        } catch (GoogleJsonResponseException e) {
-            throw new CatalogException("Failed to check if table exists: " + tablePath, e);
         } catch (IOException e) {
             throw new CatalogException("Failed to check if table exists: " + tablePath, e);
         }
@@ -273,17 +269,20 @@ public class BigQueryCatalog extends AbstractCatalog {
     }
 
     @Override
-    public void renameTable(ObjectPath tablePath, String newTableName, boolean ignoreIfNotExists) throws TableNotExistException, TableAlreadyExistException, CatalogException {
+    public void renameTable(ObjectPath tablePath, String newTableName,
+            boolean ignoreIfNotExists) throws TableNotExistException, TableAlreadyExistException, CatalogException {
         throw new UnsupportedOperationException("Function renameTable not supported yet.");
     }
 
     @Override
-    public void createTable(ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists) throws TableAlreadyExistException, DatabaseNotExistException, CatalogException {
+    public void createTable(ObjectPath tablePath, CatalogBaseTable table,
+            boolean ignoreIfExists) throws TableAlreadyExistException, DatabaseNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function createTable not supported yet.");
     }
 
     @Override
-    public void alterTable(ObjectPath tablePath, CatalogBaseTable newTable, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
+    public void alterTable(ObjectPath tablePath, CatalogBaseTable newTable,
+            boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterTable not supported yet.");
     }
 
@@ -313,17 +312,20 @@ public class BigQueryCatalog extends AbstractCatalog {
     }
 
     @Override
-    public void createPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogPartition partition, boolean ignoreIfExists) throws TableNotExistException, TableNotPartitionedException, PartitionSpecInvalidException, PartitionAlreadyExistsException, CatalogException {
+    public void createPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
+            CatalogPartition partition, boolean ignoreIfExists) throws TableNotExistException, TableNotPartitionedException, PartitionSpecInvalidException, PartitionAlreadyExistsException, CatalogException {
         throw new UnsupportedOperationException("Function createPartition not supported yet.");
     }
 
     @Override
-    public void dropPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
+    public void dropPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
+            boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function dropPartition not supported yet.");
     }
 
     @Override
-    public void alterPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogPartition newPartition, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
+    public void alterPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
+            CatalogPartition newPartition, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterPartition not supported yet.");
     }
 
@@ -343,12 +345,14 @@ public class BigQueryCatalog extends AbstractCatalog {
     }
 
     @Override
-    public void createFunction(ObjectPath functionPath, CatalogFunction function, boolean ignoreIfExists) throws FunctionAlreadyExistException, DatabaseNotExistException, CatalogException {
+    public void createFunction(ObjectPath functionPath, CatalogFunction function,
+            boolean ignoreIfExists) throws FunctionAlreadyExistException, DatabaseNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function createFunction not supported yet.");
     }
 
     @Override
-    public void alterFunction(ObjectPath functionPath, CatalogFunction newFunction, boolean ignoreIfNotExists) throws FunctionNotExistException, CatalogException {
+    public void alterFunction(ObjectPath functionPath, CatalogFunction newFunction,
+            boolean ignoreIfNotExists) throws FunctionNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterFunction not supported yet.");
     }
 
@@ -419,22 +423,26 @@ public class BigQueryCatalog extends AbstractCatalog {
     }
 
     @Override
-    public void alterTableStatistics(ObjectPath tablePath, CatalogTableStatistics tableStatistics, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
+    public void alterTableStatistics(ObjectPath tablePath, CatalogTableStatistics tableStatistics,
+            boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterTableStatistics not supported yet.");
     }
 
     @Override
-    public void alterTableColumnStatistics(ObjectPath tablePath, CatalogColumnStatistics columnStatistics, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException, TablePartitionedException {
+    public void alterTableColumnStatistics(ObjectPath tablePath, CatalogColumnStatistics columnStatistics,
+            boolean ignoreIfNotExists) throws TableNotExistException, CatalogException, TablePartitionedException {
         throw new UnsupportedOperationException("Function alterTableColumnStatistics not supported yet.");
     }
 
     @Override
-    public void alterPartitionStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogTableStatistics partitionStatistics, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
+    public void alterPartitionStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
+            CatalogTableStatistics partitionStatistics, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterPartitionStatistics not supported yet.");
     }
 
     @Override
-    public void alterPartitionColumnStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogColumnStatistics columnStatistics, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
+    public void alterPartitionColumnStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
+            CatalogColumnStatistics columnStatistics, boolean ignoreIfNotExists) throws PartitionNotExistException, CatalogException {
         throw new UnsupportedOperationException("Function alterPartitionColumnStatistics not supported yet.");
     }
 }
