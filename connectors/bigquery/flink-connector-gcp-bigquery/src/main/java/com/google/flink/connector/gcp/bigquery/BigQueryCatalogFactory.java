@@ -1,7 +1,5 @@
 package com.google.flink.connector.gcp.bigquery;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,8 +14,11 @@ import static com.google.flink.connector.gcp.bigquery.BigQueryCatalogFactoryOpti
 import static com.google.flink.connector.gcp.bigquery.BigQueryCatalogFactoryOptions.CREDENTIAL_FILE;
 import static com.google.flink.connector.gcp.bigquery.BigQueryCatalogFactoryOptions.DEFAULT_DATASET;
 
-/** Catalog factory for BigQuery Catalog. */
+/**
+ * Flink Catalog factory for BigQueryCatalog.
+ */
 public class BigQueryCatalogFactory implements CatalogFactory {
+
     private static final Logger LOG = LoggerFactory.getLogger(BigQueryCatalogFactory.class);
 
     @Override
@@ -37,7 +38,7 @@ public class BigQueryCatalogFactory implements CatalogFactory {
         final Set<ConfigOption<?>> options = new HashSet<>();
         options.add(DEFAULT_DATASET);
         options.add(CREDENTIAL_FILE);
-        options.add(BIGQUERY_PROJECT); // Add this
+        options.add(BIGQUERY_PROJECT);
         return options;
     }
 
@@ -45,10 +46,9 @@ public class BigQueryCatalogFactory implements CatalogFactory {
     public Catalog createCatalog(Context context) {
         LOG.info("BigQueryCatalogFactory.createCatalog() called with context: {}", context.getName());
 
-        final FactoryUtil.CatalogFactoryHelper helper =
-                FactoryUtil.createCatalogFactoryHelper(this, context);
+        final FactoryUtil.CatalogFactoryHelper helper
+                = FactoryUtil.createCatalogFactoryHelper(this, context);
         helper.validate();
-        LOG.info("Configuration options validated.");
 
         try {
             String defaultDataset = helper.getOptions().get(DEFAULT_DATASET);
@@ -63,10 +63,7 @@ public class BigQueryCatalogFactory implements CatalogFactory {
             );
             LOG.info("BigQueryCatalog created successfully.");
             return catalog;
-        } catch (IOException | GeneralSecurityException ex) {
-            LOG.error("Error creating BigQueryCatalog: {}", ex.getMessage(), ex);
-            return null;
-        } catch (RuntimeException ex) { // Catch any other potential runtime exceptions
+        } catch (RuntimeException ex) {
             LOG.error("Unexpected runtime error during BigQueryCatalog creation: {}", ex.getMessage(), ex);
             return null;
         }
